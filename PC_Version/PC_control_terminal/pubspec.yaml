@@ -1,0 +1,3 @@
+name: wifi_test
+dependencies:
+  easy_udp_socket: ^1.2.1

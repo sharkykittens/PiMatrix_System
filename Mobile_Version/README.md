@@ -11,3 +11,7 @@
 ### Configuration:
 
 ### Dependencies:
+
+dependencies are listed in pubspec.yaml
+> flutter pub get
+to resolve dependencies
