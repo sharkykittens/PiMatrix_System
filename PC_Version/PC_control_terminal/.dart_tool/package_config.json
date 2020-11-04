@@ -3,19 +3,19 @@
   "packages": [
     {
       "name": "async",
-      "rootUri": "file:///Users/darrentoh/.pub-cache/hosted/pub.dartlang.org/async-2.4.2",
+      "rootUri": "file:///C:/Users/owner/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/async-2.4.2",
       "packageUri": "lib/",
       "languageVersion": "2.2"
     },
     {
       "name": "collection",
-      "rootUri": "file:///Users/darrentoh/.pub-cache/hosted/pub.dartlang.org/collection-1.14.13",
+      "rootUri": "file:///C:/Users/owner/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/collection-1.14.13",
       "packageUri": "lib/",
       "languageVersion": "2.3"
     },
     {
       "name": "easy_udp_socket",
-      "rootUri": "file:///Users/darrentoh/.pub-cache/hosted/pub.dartlang.org/easy_udp_socket-1.2.1+3",
+      "rootUri": "file:///C:/Users/owner/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/easy_udp_socket-1.2.1+3",
       "packageUri": "lib/",
       "languageVersion": "2.2"
     },
@@ -25,7 +25,7 @@
       "packageUri": "lib/"
     }
   ],
-  "generated": "2020-11-03T14:06:27.967540Z",
+  "generated": "2020-11-03T14:28:15.314150Z",
   "generator": "pub",
   "generatorVersion": "2.9.1"
 }

@@ -10,15 +10,12 @@ void main() async {
     print("Please key in command");
     print("1 : Discover Devices");
     print("2 : List all Connected Devices");
-    print("3 : Record Audio");
+    print("3 : Record Audio with DOA");
     print("4 : Stop Recording");
     print("5 : Disconnect all Devices");
     print("6 : Shut Down");
     print("7 : Synchronize Devices");
     print("8 : Record with VAD enabled");
-    print("9 : Record with DOA enabled"); //in progress
-    print("10 : Record using Wakeword"); //in progress
-    print("11 : Synced Recording Mode (please synchronize devices first)");
     print("12 : Upload Files");
 
     int input = int.parse(stdin.readLineSync());
@@ -73,7 +70,7 @@ void main() async {
           print("Attempting to Sync PiMatrix Devices..");
           sleep(const Duration(seconds: 1));
           deviceManager.sendCommand("sync");
-          await deviceManager.syncDevices();
+          await deviceManager.syncDevicesTCP();
         }
         break;
       case 8:
