@@ -52,12 +52,12 @@ class BodyContent extends StatelessWidget {
             children: [
               Container(
                   color: Colors.orange,
-                  width: 50,
-                  height: 300,
+                  width: 64.3,
+                  height: 322,
                   child: Column(children: [
                     Container(
                       color: Colors.red,
-                      width: 50,
+                      width: 64.3,
                       height: 30,
                       child: Text('#',
                           style: TextStyle(fontSize: 20),
@@ -65,8 +65,8 @@ class BodyContent extends StatelessWidget {
                     ),
                     Container(
                         color: Colors.blue[100],
-                        width: 50,
-                        height: 255.7,
+                        width: 64.3,
+                        height: 270,
                         child: ListView(children: <Widget>[
                           BlocBuilder<DeviceManager, Map>(
                               builder: (context, state) {
@@ -87,12 +87,12 @@ class BodyContent extends StatelessWidget {
                   ])),
               Container(
                   color: Colors.blue,
-                  width: 170,
-                  height: 300,
+                  width: 184.3,
+                  height: 322,
                   child: Column(children: [
                     Container(
                       color: Colors.red,
-                      width: 170,
+                      width: 184.3,
                       height: 30,
                       child: Text('Device',
                           style: TextStyle(fontSize: 20),
@@ -100,8 +100,8 @@ class BodyContent extends StatelessWidget {
                     ),
                     Container(
                         color: Colors.blue[100],
-                        width: 170,
-                        height: 255.7,
+                        width: 184.3,
+                        height: 270,
                         child: ListView(children: <Widget>[
                           BlocBuilder<DeviceManager, Map>(
                               builder: (context, state) {
@@ -121,13 +121,13 @@ class BodyContent extends StatelessWidget {
                         ]))
                   ])),
               Container(
-                  width: 150,
-                  height: 300,
+                  width: 164.3,
+                  height: 322,
                   color: Colors.purple,
                   child: Column(children: [
                     Container(
                       color: Colors.red,
-                      width: 150,
+                      width: 164.3,
                       height: 30,
                       child: Text('Status',
                           style: TextStyle(fontSize: 20),
@@ -135,8 +135,8 @@ class BodyContent extends StatelessWidget {
                     ),
                     Container(
                         color: Colors.blue[100],
-                        width: 150,
-                        height: 255.7,
+                        width: 164.3,
+                        height: 270,
                         child: ListView(children: <Widget>[
                           BlocBuilder<DeviceManager, Map>(
                               builder: (context, state) {
@@ -162,8 +162,8 @@ class BodyContent extends StatelessWidget {
               child: Column(
             children: <Widget>[
               Container(
-                  height: 63.75,
-                  width: 375,
+                  height: 65,
+                  width: 413,
                   color: Colors.blue[50],
                   child: Row(children: <Widget>[
                     ButtonBar(
@@ -198,8 +198,8 @@ class BodyContent extends StatelessWidget {
                     )
                   ])),
               Container(
-                  height: 63.75,
-                  width: 375,
+                  height: 65,
+                  width: 413,
                   color: Colors.blue[100],
                   child: Row(children: <Widget>[
                     ButtonBar(
@@ -239,8 +239,8 @@ class BodyContent extends StatelessWidget {
                     )
                   ])),
               Container(
-                  height: 63.75,
-                  width: 375,
+                  height: 65,
+                  width: 413,
                   color: Colors.blue[200],
                   child: Row(children: <Widget>[
                     ButtonBar(
@@ -264,15 +264,15 @@ class BodyContent extends StatelessWidget {
                             height: 47,
                             child: RaisedButton(
                                 onPressed: () {},
-                                child: Text("Button Button"))),
+                                child: Text("Cubit Function"))),
                       ],
                     )
                   ])),
               Container(
-                  height: 63.75,
-                  width: 375,
+                  height: 65,
+                  width: 413,
                   color: Colors.blue[300],
-                  child: Row(children: <Widget>[
+                  /*child: Row(children: <Widget>[
                     ButtonBar(
                       children: <Widget>[
                         SizedBox(
@@ -280,23 +280,23 @@ class BodyContent extends StatelessWidget {
                             height: 47,
                             child: RaisedButton(
                                 onPressed: () {},
-                                child: Text("Button Button"))),
+                                child: Text(""))),
                         SizedBox(
                             width: 114,
                             height: 47,
                             child: RaisedButton(
                                 onPressed: () {},
-                                child: Text("Button Button"))),
+                                child: Text(""))),
                         SizedBox(
                             width: 114,
                             height: 47,
                             child: RaisedButton(
                                 onPressed: () =>
                                     context.bloc<DeviceManager>().cubitTest(),
-                                child: Text("Cubit Test"))),
-                      ],
-                    )
-                  ])),
+                                child: Text(""))),
+                        ],
+                   ) 
+                  ])*/),
             ],
           ))
         ],

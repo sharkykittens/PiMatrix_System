@@ -1,0 +1,21 @@
+dependencies: \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Runner/GeneratedPluginRegistrant.m \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Runner/GeneratedPluginRegistrant.h \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Modules/module.modulemap \
+  /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.1.sdk/usr/include/mach-o/compact_unwind_encoding.modulemap \
+  /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.1.sdk/usr/include/mach-o/dyld.modulemap \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Headers/FlutterTexture.h \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Headers/FlutterPlugin.h \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Headers/FlutterEngine.h \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Headers/FlutterDartProject.h \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Headers/FlutterBinaryMessenger.h \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Headers/FlutterViewController.h \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Headers/FlutterPluginAppLifeCycleDelegate.h \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Headers/FlutterPlatformViews.h \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Headers/FlutterHeadlessDartRunner.h \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Headers/FlutterChannels.h \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Headers/FlutterCallbackCache.h \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Headers/FlutterCodecs.h \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Headers/FlutterMacros.h \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Headers/FlutterAppDelegate.h \
+  /Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Flutter/Flutter.framework/Headers/Flutter.h
