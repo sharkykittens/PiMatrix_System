@@ -60,7 +60,7 @@ def play_audio_file(fname=DETECT_DING):
 def start_program():
     os.system('sudo ifconfig wlan0 up')
     os.system('vcgencmd display_power 1')
-    os.system('python3 ~/Desktop/headless.py')
+    os.system('python3 ~/Desktop/PiMatrix_firmware/PiMatrix/pimatrix_firmware.py')
 
 
 class HotwordDetector(object):

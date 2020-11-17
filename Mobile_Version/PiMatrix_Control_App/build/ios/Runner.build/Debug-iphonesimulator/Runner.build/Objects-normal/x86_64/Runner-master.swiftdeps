@@ -1,0 +1,5 @@
+version: "Apple Swift version 5.3 (swiftlang-1200.0.29.2 clang-1200.0.30.1)"
+options: "ed75592e64368500cce5394f0a456075"
+build_time: [1605033805, 996805000]
+inputs:
+  "/Users/darrentoh/Desktop/PiMatrix_System/Mobile_Version/PiMatrix_Control_App/ios/Runner/AppDelegate.swift": [1604411631, 624991921]
