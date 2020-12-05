@@ -90,15 +90,15 @@ class tcpSlave(object):
                         led.set('black')
                         temp_head = temp_list.pop(0)
                         temp_list.append(temp_head)
-                        print(temp_list)
+                        #print(temp_list)
                         self.blue=temp_list[:]
                         
                     print("Done!")
                     led.set(self.green)
                     last_data = tcp_sync_connection.recv(4096)
                     last_data = last_data.decode("UTF-8")
-                    print(data)
-                    if (data == "final" or data == "sync"):
+                    print(last_data)
+                    if (last_data == "final" or last_data == "sync"):
                         final_offset = tcp_sync_connection.recv(4096).decode()
                         print(type(final_offset))
                         print(final_offset)

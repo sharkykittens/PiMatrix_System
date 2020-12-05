@@ -73,7 +73,8 @@ class Main(threading.Thread):
         # to store all files created in this session to use to upload later
         self.session_file_list = []
         self.drive = None #to be authenticated
-        self.shared_buffer = deque([],maxlen=2) # to share audio data among threads
+        self.shared_buffer = deque([]) # to share audio data among threads
+        self.beamforming_processing_flag = False
 
         while (self.connection == False):
             ps = subprocess.Popen(
@@ -86,20 +87,13 @@ class Main(threading.Thread):
                 ntp_loop = ["black"] * led.length
                 ntp_loop[0] = 'pink'
                 led.set(ntp_loop)
-                sub1 = subprocess.Popen(['sudo service ntp stop'], shell=True)
+                
+                sub1 = subprocess.Popen(["sudo chronyc -a 'burst 4/4'"], shell=True)
                 sub1.wait()
-                sub2 = subprocess.Popen(
-                    ['sudo ntpdate -s time.nist.gov'], shell=True)
-                sub2.wait()
-                sub3 = subprocess.Popen(['sudo service ntp start'], shell=True)
+                time.sleep(10)
+                sub3 = subprocess.Popen(["sudo chronyc -a 'makestep'"], shell=True)
                 sub3.wait()
-                """
-                for x in range(30):
-                    ntp_loop[x] = 'black'
-                    ntp_loop[x+1] = 'pink'
-                    led.set(ntp_loop)
-                    time.sleep(1.5)
-                """
+                
                 led.set(self.gold)
             except subprocess.CalledProcessError:
                 print("No wireless networks connected")
@@ -147,6 +141,11 @@ class Main(threading.Thread):
     def script_exit(self):
         
         led.set('black')
+        
+
+    def call_hotword(self):
+        led.set('black')
+        os.system('python3 /home/pi/Desktop/PiMatrix_firmware/PiMatrix/wakeword/Snowboy/wakeword.py &')
 
     def kill_script(self):
 
@@ -155,6 +154,9 @@ class Main(threading.Thread):
             if (key == "esc"):
                 print("terminating script...")
                 self.script_exit()
+                os._exit(1)
+            elif (key == "restart"):
+                self.call_hotword()
                 os._exit(1)
 
     def udpBroadcastReceiver(self):
@@ -266,13 +268,14 @@ class Main(threading.Thread):
                             self.recording = True
                             record2disk_thread = threading.Thread(
                                 target=record2disk,args=[self], name="record2disk_thread")
-                            beamformer_thread = threading.Thread(
-                                target=beamformer.beamform,args=[self],name="beamformer_thread")
+                            #beamformer_thread = threading.Thread(
+                            #    target=beamformer.beamform,args=[self],name="beamformer_thread")
                             
                             record2disk_thread.daemon = True
-                            beamformer_thread.daemon = True
+                            #beamformer_thread.daemon = True
                             record2disk_thread.start()
-                            beamformer_thread.start()
+                            #beamformer_thread.start()
+                            
                             print("recording initiated")
 
                     elif (command == 'F'):
@@ -323,276 +326,6 @@ class Main(threading.Thread):
                     else:
                         print("Error input, waiting for next input ")
 
-    """
-
-    def vad_record(self):
-
-        class Frame(object):
-            
-            "Represents a "frame" of audio data. Duration of frame must be 10,20 or 30""
-
-            def __init__(self, bytes, timestamp, duration):
-                self.bytes = bytes
-                self.timestamp = timestamp
-                self.duration = duration
-
-        def frame_generator(frame_duration_ms, audio, sample_rate):
-            "Generates audio frames from PCM audio data.
-
-            Takes the desired frame duration in milliseconds, the PCM data, and
-            the sample rate.
-
-            Yields Frames of the requested duration.
-            "
-            n = int(sample_rate * (frame_duration_ms / 1000.0) * 2)
-            offset = 0
-            timestamp = 0.0
-            duration = (float(n) / sample_rate) / 2.0
-            while offset + n < len(audio):
-                yield Frame(audio[offset:offset + n], timestamp, duration)
-                timestamp += duration
-                offset += n
-
-        def output_frame(timestamp, frame_array, CHANNELS, FORMAT, RATE):
-
-            filename = ("/home/pi/Desktop/recordings/VAD_"+socket.gethostname() +
-                        "_"+timestamp+".wav")
-
-            self.session_file_list.append(filename)
-            output = wave.open(filename, 'wb')
-            output.setnchannels(CHANNELS)
-            output.setsampwidth(mic.get_sample_size(FORMAT))
-            output.setframerate(RATE)
-            output.writeframes(b''.join(frame_array))
-            output.close()
-            print("VAD Chunk " + timestamp + " successfully saved!")
-
-        buffer1 = deque([], maxlen=2)
-        buffer2 = deque([], maxlen=2)
-
-        print("starting recording..")
-        # wait till offset to synchronize across all devices
-        print(self.record_time_start)
-        pause.until(time.time()+self.record_time_start)
-
-        # VAD udp server
-        UDP_IP = "0.0.0.0"
-        UDP_VAD_PORT = 8641
-        UDPVAD = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        UDPVAD.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        UDPVAD.bind((UDP_IP, 8641))
-
-        # recording Configs:
-        CHUNK = 2048
-        FORMAT = pyaudio.paInt16
-        CHANNELS = 8
-        RATE = 16000  # SAMPLE RATE
-        RECORD_SECONDS = 5
-        mic = pyaudio.PyAudio()
-        stream = mic.open(format=FORMAT, channels=CHANNELS,
-                          rate=RATE, input=True, frames_per_buffer=CHUNK)
-        collected_VAD = []  # buffer to store collected frames
-        # stores up to 500 previous frames or about 1 second worth of audio data
-        past_frames = deque([], maxlen=500)
-        empty_frame_counter = 0
-        frame_flag = False  # represents that the a current set of recording is ongoing
-        framesgenerated = []
-        last_empty_frame = b''
-        vad = webrtcvad.Vad(3)
-        status = 0
-        # variable to be used to mark timestamps for VAD recordings
-        timestamp = str(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
-
-        while(self.recording):
-            for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-                data = stream.read(CHUNK)
-                buffer1.append(data)
-                if len(buffer1) == 2:
-
-                    buffer2.append(buffer1.popleft())
-                if len(buffer2) == 2:
-                    streamdata = buffer2.popleft()  # this data to be used by any processing thread
-                    framesgenerated = frame_generator(20, streamdata, RATE)
-                    framesgenerated = list(framesgenerated)
-
-                for frame in framesgenerated:
-                    past_frames.append(frame.bytes)
-                    speech_frame = vad.is_speech(frame.bytes, RATE)
-
-                    if(speech_frame == True):
-                        # when speech is detected, send a signal to the controller
-
-                        UDPVAD.sendto('activate_VAD'.encode(),
-                                      (self.controller_ip, UDP_VAD_PORT))
-
-                    if(self.sync_vad_flag == True):
-                        if(speech_frame != True):
-                            empty_frame_counter = empty_frame_counter + 1
-                        else:
-                            # reset if no subsequent chain of empty frames
-                            empty_frame_counter = 0
-
-                        if(empty_frame_counter > 1000):
-                            self.sync_vad_flag = False
-
-                        led.set(self.green)
-                        if(frame_flag == False):
-                            timestamp = str(
-                                datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
-                            led.set(self.green)
-                            collected_VAD.extend(past_frames)
-                            past_frames.clear()
-                            # collected_VAD.append(last_empty_frame)
-                            print("3", end='')
-                            collected_VAD.append(frame.bytes)
-                            print("1", end='')
-
-                            frame_flag = True
-                        else:
-                            collected_VAD.append(frame.bytes)
-                            print("1", end='')
-
-                    else:
-                        if(empty_frame_counter > 1000):
-                            frame_flag = False
-                            empty_frame_counter = 0
-                            led.set('black')
-                            print("0", end='')
-                            frame_array = collected_VAD.copy()
-                            output_frame(timestamp, frame_array,
-                                         CHANNELS, FORMAT, RATE)
-                            collected_VAD = []
-                            past_frames.append(frame.bytes)
-
-                            #last_empty_frame = frame.bytes
-
-            print("recording in progress..")
-
-        else:
-            print("stopping recording..")
-            while buffer2:
-                collected_VAD.append(buffer2.popleft())
-            led.set(['green', 'black', 'black', 'black', 'black', 'black', 'black', 'green', 'black', 'black', 'black', 'black', 'black', 'black', 'green', 'black', 'black',
-                     'black', 'black', 'black', 'black', 'green', 'black', 'black', 'black', 'black', 'black', 'black', 'green', 'black', 'black', 'black', 'black', 'black', 'black'])
-
-        stream.stop_stream()
-        stream.close()
-        mic.terminate()
-        filename = ("/home/pi/Desktop/recordings/VAD_"+socket.gethostname()+"_" +
-                    str(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))+".wav")
-        self.session_file_list.append(filename)
-        outputFile = wave.open(filename, 'wb')
-        outputFile.setnchannels(CHANNELS)
-        outputFile.setsampwidth(mic.get_sample_size(FORMAT))
-        outputFile.setframerate(RATE)
-        outputFile.writeframes(b''.join(collected_VAD))
-        outputFile.close()
-        print("Recording successfully saved!")
-        time.sleep(2)
-        led.set(['blue', 'black', 'black', 'black', 'black', 'black', 'black', 'blue', 'black', 'black', 'black', 'black', 'black', 'black', 'blue', 'black', 'black',
-                 'black', 'black', 'black', 'black', 'blue', 'black', 'black', 'black', 'black', 'black', 'black', 'blue', 'black', 'black', 'black', 'black', 'black', 'black'])
-
-        sys.exit()  # deletes this thread safely
-
-    """
-
-    """
-
-    def record2disk(self):
-
-        buffer1 = deque([], 2)
-        buffer2 = deque([], 2)
-
-        print("starting recording..")
-
-        everloop = ['black'] * led.length
-        ledAdjust = 0.0
-        if len(everloop) == 35:
-            ledAdjust = 0.51  # MATRIX Creator
-        else:
-            ledAdjust = 1.01  # MATRIX Voice
-
-        frequency = 0.375
-        counter = 0.0
-        tick = len(everloop) - 1
-
-        # pause here by offset so that all devices start recording together
-        print(self.record_time_start)
-        pause.until(time.time()+self.record_time_start)
-
-        # recording Configs:
-        CHUNK = 2048
-        FORMAT = pyaudio.paInt16
-        CHANNELS = 8
-        RATE = 16000  # SAMPLE RATE
-        RECORD_SECONDS = 5
-        mic = pyaudio.PyAudio()
-        stream = mic.open(format=FORMAT, channels=CHANNELS,
-                          rate=RATE, input=True, frames_per_buffer=CHUNK)
-
-        frames = []
-        print("current time is: ")
-        print(time.time())
-        while(self.recording):
-
-            for i in range(len(everloop)):
-                r = round(
-                    max(0, (sin(frequency*counter+(pi/180*240))*155+100)/10))
-                g = round(
-                    max(0, (sin(frequency*counter+(pi/180*120))*155+100)/10))
-                b = round(max(0, (sin(frequency*counter)*155+100)/10))
-
-                counter += ledAdjust
-
-                everloop[i] = {'r': r, 'g': g, 'b': b}
-
-            # Slowly show rainbow
-            if tick != 0:
-                for i in reversed(range(tick)):
-                    everloop[i] = {}
-                tick -= 1
-
-            led.set(everloop)
-
-            time.sleep(.035)
-
-            for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-                data = stream.read(CHUNK)
-                buffer1.append(data)
-                if len(buffer1) == 2:
-
-                    buffer2.append(buffer1.popleft())
-                if len(buffer2) == 2:
-                    streamdata = buffer2.popleft()  # this data to be used by any processing thread
-                    frames.append(streamdata)
-
-            print("recording in progress..")
-
-        else:
-            print("stopping recording..")
-            while buffer2:
-                frames.append(buffer2.popleft())
-            led.set(['green', 'black', 'black', 'black', 'black', 'black', 'black', 'green', 'black', 'black', 'black', 'black', 'black', 'black', 'green', 'black', 'black',
-                     'black', 'black', 'black', 'black', 'green', 'black', 'black', 'black', 'black', 'black', 'black', 'green', 'black', 'black', 'black', 'black', 'black', 'black'])
-
-        stream.stop_stream()
-        stream.close()
-        mic.terminate()
-        filename = ("/home/pi/Desktop/recordings/recording_"+socket.gethostname()+"_"+str(
-            datetime.datetime.now().strftime('%Y-%m-%d_%H:%M'))+".wav")
-        self.session_file_list.append(filename)
-        outputFile = wave.open(filename, 'wb')
-        outputFile.setnchannels(CHANNELS)
-        outputFile.setsampwidth(mic.get_sample_size(FORMAT))
-        outputFile.setframerate(RATE)
-        outputFile.writeframes(b''.join(frames))
-        outputFile.close()
-        print("Recording successfully saved!")
-        time.sleep(2)
-        led.set(['blue', 'black', 'black', 'black', 'black', 'black', 'black', 'blue', 'black', 'black', 'black', 'black', 'black', 'black', 'blue', 'black', 'black',
-                 'black', 'black', 'black', 'black', 'blue', 'black', 'black', 'black', 'black', 'black', 'black', 'blue', 'black', 'black', 'black', 'black', 'black', 'black'])
-
-        sys.exit()  # deletes this thread safely """
 
 
 
@@ -609,6 +342,10 @@ if __name__ == "__main__":
 # 1.4 : Implemented Sync VAD Functionality
 # 1.5 : Implemented OAuth and upload file to server
 # 1.6 : Implemented Wake word
-# 1.7 : Implemented DOA and Beamforming
+# 1.7 : Implemented DOA and Beamformer
+
+# TODO:
+
+
 
 

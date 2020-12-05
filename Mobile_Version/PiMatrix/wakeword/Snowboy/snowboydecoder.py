@@ -61,6 +61,8 @@ def start_program():
     os.system('sudo ifconfig wlan0 up')
     os.system('vcgencmd display_power 1')
     os.system('python3 ~/Desktop/PiMatrix_firmware/PiMatrix/pimatrix_firmware.py')
+    print("finished2")
+    
 
 
 class HotwordDetector(object):
@@ -178,6 +180,8 @@ class HotwordDetector(object):
                 if callback is not None:
                     self.terminate()
                     callback()
+                    print("finished")
+                    os._exit(1)
 
         logger.debug("finished.")
 

@@ -54,6 +54,10 @@ def vad_record(self):
             output.close()
             print("VAD Chunk " + timestamp + " successfully saved!")
 
+        
+
+        #Configuration Code starts here
+
         buffer1 = deque([], maxlen=2)
         buffer2 = deque([], maxlen=2)
 
@@ -70,7 +74,7 @@ def vad_record(self):
         UDPVAD.bind((UDP_IP, 8641))
 
         # recording Configs:
-        CHUNK = 2048
+        CHUNK = 3840
         FORMAT = pyaudio.paInt16
         CHANNELS = 8
         RATE = 16000  # SAMPLE RATE
@@ -79,6 +83,7 @@ def vad_record(self):
         stream = mic.open(format=FORMAT, channels=CHANNELS,
                           rate=RATE, input=True, frames_per_buffer=CHUNK)
         collected_VAD = []  # buffer to store collected frames
+        combined_VAD = [] #buffer to store the total combined audio
         # stores up to 500 previous frames or about 1 second worth of audio data
         past_frames = deque([], maxlen=500)
         empty_frame_counter = 0
@@ -90,17 +95,19 @@ def vad_record(self):
         # variable to be used to mark timestamps for VAD recordings
         timestamp = str(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))
 
+        combined_filename = ("/home/pi/Desktop/recordings/Combined_VAD_"+socket.gethostname() +
+                        "_"+timestamp+".wav")
+
         while(self.recording):
             for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
                 data = stream.read(CHUNK)
-                buffer1.append(data)
-                if len(buffer1) == 2:
-
-                    buffer2.append(buffer1.popleft())
-                if len(buffer2) == 2:
+                buffer2.append(data)
+        
+                if len(buffer2) == 1:
                     streamdata = buffer2.popleft()  # this data to be used by any processing thread
-                    framesgenerated = frame_generator(20, streamdata, RATE)
+                    framesgenerated = frame_generator(20, streamdata, RATE) #converts chunk of 2048 into frames of 20ms
                     framesgenerated = list(framesgenerated)
+                    print("length of frames generated is " + str(len(framesgenerated))) #debug
 
                 for frame in framesgenerated:
                     past_frames.append(frame.bytes)
@@ -146,6 +153,7 @@ def vad_record(self):
                             led.set('black')
                             print("0", end='')
                             frame_array = collected_VAD.copy()
+                            combined_VAD.extend(collected_VAD)
                             output_frame(timestamp, frame_array,
                                          CHANNELS, FORMAT, RATE)
                             collected_VAD = []
@@ -165,6 +173,8 @@ def vad_record(self):
         stream.stop_stream()
         stream.close()
         mic.terminate()
+        combined_VAD.extend(collected_VAD)
+        #save the last chunk of VAD audio
         filename = ("/home/pi/Desktop/recordings/VAD_"+socket.gethostname()+"_" +
                     str(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S'))+".wav")
         self.session_file_list.append(filename)
@@ -174,6 +184,16 @@ def vad_record(self):
         outputFile.setframerate(RATE)
         outputFile.writeframes(b''.join(collected_VAD))
         outputFile.close()
+
+        #save the combined chunks of VAD audio
+        self.session_file_list.append(combined_filename)
+        outputCombinedFile = wave.open(combined_filename,'wb')
+        outputCombinedFile.setnchannels(CHANNELS)
+        outputCombinedFile.setsampwidth(mic.get_sample_size(FORMAT))
+        outputCombinedFile.setframerate(RATE)
+        outputCombinedFile.writeframes(b''.join(combined_VAD))
+        outputCombinedFile.close()
+
         print("Recording successfully saved!")
         time.sleep(2)
         led.set(['blue', 'black', 'black', 'black', 'black', 'black', 'black', 'blue', 'black', 'black', 'black', 'black', 'black', 'black', 'blue', 'black', 'black',

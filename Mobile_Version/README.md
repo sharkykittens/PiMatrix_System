@@ -3,7 +3,9 @@
 ## Running the System
 
 1. Ensure that the PiMatrix device is configured to automatically connect to the mobile device's hotspot
-2. Start the PiMatrix device and speak the chosen wakeword
+2. Start the PiMatrix device and speak the chosen wakeword/hotword
+   > Refer to the Wakeword portion for detailed explanation on how to use this
+   > You may choose to disable the wakeword portion of the system by disabling the script on bootup as explained in the wakeword section
 3. Wait until the PiMatrix device flashes golden, this means that it is ready for discover
 4. Start the mobile application and select Discover Devices.
 
